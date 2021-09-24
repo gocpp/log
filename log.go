@@ -266,13 +266,31 @@ func timeEncoder(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
 // 	enc.AppendInt64(t.UnixNano() / 1e6)
 // }
 
-func SetLevel(level zapcore.Level) {
+func SetLevel(name string) {
 	if l == nil {
 		return
 	}
+
+	level := zapcore.InfoLevel
+	lowName := strings.ToLower(name)
+
+	switch lowName {
+	case "debug":
+		level = zap.DebugLevel
+	case "info":
+		level = zap.InfoLevel
+	case "warn":
+		level = zap.WarnLevel
+	case "error":
+		level = zap.ErrorLevel
+	default:
+		l.Error("[SetLevel] fail. not support level", zap.String("level", name))
+		return
+	}
+
 	l.Opts.Level = level
 	l.zapConfig.Level.SetLevel(l.Opts.Level)
-	l.Info("[SetLevel] success")
+	l.Info("[SetLevel] success", zap.String("level", name))
 }
 
 func Sync() {
