@@ -9,7 +9,7 @@ import (
 )
 
 func TestInitZapV2Logger(t *testing.T) {
-	lg := NewLogger(WithAppName("wechat"), WithDevelopment(true), WithLevel(zap.DebugLevel))
+	lg := NewLogger(WithAppName("wechat"), WithDevelopment(true), WithLevel("debug"))
 	for i := 0; i < 10; i++ {
 		time.Sleep(time.Second)
 		lg.Debug(fmt.Sprint("debug log ", 1), zap.Int("line", 47))

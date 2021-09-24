@@ -196,7 +196,26 @@ func WithAppName(AppName string) Option {
 	}
 }
 
-func WithLevel(Level zapcore.Level) Option {
+func strToLevel(str string) (level zapcore.Level) {
+	switch str {
+	case "debug":
+		level = zap.DebugLevel
+	case "info":
+		level = zap.InfoLevel
+	case "warn":
+		level = zap.WarnLevel
+	case "error":
+		level = zap.ErrorLevel
+	case "panic":
+		level = zap.PanicLevel
+	case "fatal":
+		level = zap.FatalLevel
+	}
+	return
+}
+
+func WithLevel(name string) Option {
+	Level := strToLevel(strings.ToLower(name))
 	return func(option *Options) {
 		option.Level = Level
 	}
@@ -271,24 +290,7 @@ func SetLevel(name string) {
 		return
 	}
 
-	level := zapcore.InfoLevel
-	lowName := strings.ToLower(name)
-
-	switch lowName {
-	case "debug":
-		level = zap.DebugLevel
-	case "info":
-		level = zap.InfoLevel
-	case "warn":
-		level = zap.WarnLevel
-	case "error":
-		level = zap.ErrorLevel
-	default:
-		l.Error("[SetLevel] fail. not support level", zap.String("level", name))
-		return
-	}
-
-	l.Opts.Level = level
+	l.Opts.Level = strToLevel(strings.ToLower(name))
 	l.zapConfig.Level.SetLevel(l.Opts.Level)
 	l.Info("[SetLevel] success", zap.String("level", name))
 }
