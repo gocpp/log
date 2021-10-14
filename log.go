@@ -10,9 +10,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/natefinch/lumberjack"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"gopkg.in/natefinch/lumberjack.v2"
 )
 
 type Options struct {
@@ -27,6 +27,7 @@ type Options struct {
 	MaxSize       int           // 日志文件小大（M）
 	MaxBackups    int           // 最多存在多少个切片文件
 	MaxAge        int           // 保存的最大天数
+	Compress      bool          // 是否压缩归档
 	Development   bool          // 是否是开发模式
 	zap.Config
 	Merge bool // 是否合并日志
@@ -103,6 +104,7 @@ func NewLogger(opt ...Option) *zap.Logger {
 		MaxSize:    100,
 		MaxBackups: 60,
 		MaxAge:     30,
+		Compress:   false,
 	}
 	if l.Opts.LogFileDir == "" {
 		l.Opts.LogFileDir, _ = filepath.Abs(filepath.Dir(filepath.Join(".")))
@@ -159,7 +161,7 @@ func (l *Logger) setSyncers() {
 			MaxSize:    l.Opts.MaxSize,
 			MaxBackups: l.Opts.MaxBackups,
 			MaxAge:     l.Opts.MaxAge,
-			Compress:   true,
+			Compress:   l.Opts.Compress,
 			LocalTime:  true,
 		})
 	}
@@ -247,6 +249,12 @@ func WithInfoFileName(InfoFileName string) Option {
 func WithDebugFileName(DebugFileName string) Option {
 	return func(option *Options) {
 		option.DebugFileName = DebugFileName
+	}
+}
+
+func WithCompress(Compress bool) Option {
+	return func(option *Options) {
+		option.Compress = Compress
 	}
 }
 
